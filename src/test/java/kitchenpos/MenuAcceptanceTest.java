@@ -99,7 +99,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         메뉴_생성_실패됨(그룹없음);
 
         //given
-        Product 존재하지_않는_상품 = new Product();
+        Product 존재하지_않는_상품 = new Product(null, null, null);
         // when
         ExtractableResponse<Response> 없는상품 = 메뉴_생성_요청("페페로니피자, 콜라",
                 BigDecimal.valueOf(15_000L), 피자세트.getId(), 존재하지_않는_상품);
