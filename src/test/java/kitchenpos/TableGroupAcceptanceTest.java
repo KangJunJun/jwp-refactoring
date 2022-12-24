@@ -27,11 +27,8 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
     private OrderTable 테이블3;
     private OrderTable 테이블4;
 
-    @Override
     @BeforeEach
     public void setUp() {
-        super.setUp();
-
         테이블1 = 테이블_생성_요청(true, 0).as(OrderTable.class);
         테이블2 = 테이블_생성_요청(true, 0).as(OrderTable.class);
         테이블3 = 테이블_생성_요청(true, 0).as(OrderTable.class);

@@ -30,10 +30,8 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     private static Product 페페로니피자;
     private static Product 콜라;
 
-    @Override
     @BeforeEach
     public void setUp() {
-        super.setUp();
 
         피자세트 = 메뉴_그룹_생성_요청("피자세트").as(MenuGroup.class);
         페페로니피자 = 상품_생성_요청("페페로니피자", BigDecimal.valueOf(20_000L)).as(Product.class);

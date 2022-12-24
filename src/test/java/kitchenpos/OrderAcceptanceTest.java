@@ -34,11 +34,9 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     private OrderTable 빈_테이블;
     private OrderTable 테이블;
     private Menu 페페로니피자;
-    @Override
+
     @BeforeEach
     public void setUp() {
-        super.setUp();
-
         테이블 = 테이블_생성_요청(false, 5).as(OrderTable.class);
         빈_테이블 = 테이블_생성_요청(true, 0).as(OrderTable.class);
         페페로니피자 = 메뉴_등록_요청().as(Menu.class);
