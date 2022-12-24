@@ -5,11 +5,10 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import kitchenpos.domain.MenuGroup;
+import kitchenpos.menu.domain.MenuGroup;
+import kitchenpos.menu.dto.MenuGroupRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -51,8 +50,7 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
 
 
     public static ExtractableResponse<Response> 메뉴_그룹_생성_요청(String name) {
-        Map<String, Object> request = new HashMap<>();
-        request.put("name", name);
+        MenuGroupRequest request = new MenuGroupRequest(name);
         return RestAssured
                 .given().log().all()
                 .body(request)

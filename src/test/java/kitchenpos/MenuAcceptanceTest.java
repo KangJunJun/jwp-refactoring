@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
+import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.product.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,13 +26,12 @@ import org.springframework.http.MediaType;
 @DisplayName("메뉴 관련 기능")
 public class MenuAcceptanceTest extends AcceptanceTest {
 
-    private static MenuGroup 피자세트;
+    private MenuGroup 피자세트;
     private static Product 페페로니피자;
     private static Product 콜라;
 
     @BeforeEach
     public void setUp() {
-
         피자세트 = 메뉴_그룹_생성_요청("피자세트").as(MenuGroup.class);
         페페로니피자 = 상품_생성_요청("페페로니피자", BigDecimal.valueOf(20_000L)).as(Product.class);
         콜라 = 상품_생성_요청("콜라", BigDecimal.valueOf(2_000L)).as(Product.class);

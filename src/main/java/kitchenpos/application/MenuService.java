@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import kitchenpos.menu.application.MenuGroupService;
 import kitchenpos.product.application.ProductService;
 import kitchenpos.product.domain.Product;
 import kitchenpos.dao.MenuDao;
-import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
@@ -17,14 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MenuService {
     private final MenuDao menuDao;
-    private final MenuGroupDao menuGroupDao;
+    private final MenuGroupService menuGroupService;
     private final MenuProductDao menuProductDao;
     private final ProductService productService;
 
 
-    public MenuService(MenuDao menuDao, MenuGroupDao menuGroupDao, MenuProductDao menuProductDao, ProductService productService) {
+    public MenuService(MenuDao menuDao, MenuGroupService menuGroupService, MenuProductDao menuProductDao, ProductService productService) {
         this.menuDao = menuDao;
-        this.menuGroupDao = menuGroupDao;
+        this.menuGroupService = menuGroupService;
         this.menuProductDao = menuProductDao;
         this.productService = productService;
     }
@@ -37,7 +37,7 @@ public class MenuService {
             throw new IllegalArgumentException();
         }
 
-        if (!menuGroupDao.existsById(menu.getMenuGroupId())) {
+        if (!menuGroupService.existsById(menu.getMenuGroupId())) {
             throw new IllegalArgumentException();
         }
 

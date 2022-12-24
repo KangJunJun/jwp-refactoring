@@ -6,11 +6,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import kitchenpos.product.domain.Product;
+import kitchenpos.product.dto.ProductRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -66,14 +65,12 @@ public class ProductAcceptanceTest extends AcceptanceTest {
 
 
     public static ExtractableResponse<Response> 상품_생성_요청(String name, BigDecimal price) {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("name", name);
-        requestBody.put("price", price);
+        ProductRequest request = new ProductRequest(name, price);
 
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestBody)
+                .body(request)
                 .when().post("/api/products")
                 .then().log().all()
                 .extract();
