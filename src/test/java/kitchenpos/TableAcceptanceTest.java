@@ -1,7 +1,7 @@
 package kitchenpos;
 
-import static kitchenpos.OrderAcceptanceTest.메뉴_등록_요청;
 import static kitchenpos.OrderAcceptanceTest.주문_생성_요청;
+import static kitchenpos.OrderAcceptanceTest.페페로니피자_등록_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.menu.dto.MenuResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,6 @@ import org.springframework.http.MediaType;
 @DisplayName("테이블 관련 기능")
 public class TableAcceptanceTest extends AcceptanceTest {
 
-    private OrderTable 빈_테이블;
-    private OrderTable 손님이_있는_테이블;
     /**
      * Feature: 테이블 관련 기능
      *  Scenario: 테이블 추가 조회
@@ -57,13 +55,13 @@ public class TableAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 테이블_생성_요청(true, 0);
         // then
         테이블_생성됨(response);
-        빈_테이블 = response.as(OrderTable.class);
+        OrderTable 빈_테이블 = response.as(OrderTable.class);
 
         // when
         ExtractableResponse<Response> 테이블 = 테이블_생성_요청(false, 5);
         // then
         테이블_생성됨(테이블);
-        손님이_있는_테이블 = 테이블.as(OrderTable.class);
+        OrderTable 손님이_있는_테이블 = 테이블.as(OrderTable.class);
 
         // when
         ExtractableResponse<Response> 조회 = 테이블_목록_조회_요청();
@@ -191,7 +189,7 @@ public class TableAcceptanceTest extends AcceptanceTest {
 
     public static OrderTable 주문이_들어간_테이블_가져오기() {
         OrderTable 주문이_들어간_테이블 = 테이블_생성_요청(false, 5).as(OrderTable.class);
-        Menu 등록된_메뉴 = 메뉴_등록_요청().as(Menu.class);
+        MenuResponse 등록된_메뉴 = 페페로니피자_등록_요청().as(MenuResponse.class);
 
         주문_생성_요청(주문이_들어간_테이블, 등록된_메뉴);
 

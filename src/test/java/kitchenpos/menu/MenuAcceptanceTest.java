@@ -1,7 +1,7 @@
-package kitchenpos;
+package kitchenpos.menu;
 
-import static kitchenpos.MenuGroupAcceptanceTest.메뉴_그룹_생성_요청;
-import static kitchenpos.ProductAcceptanceTest.상품_생성_요청;
+import static kitchenpos.menu.MenuGroupAcceptanceTest.메뉴_그룹_생성_요청;
+import static kitchenpos.product.ProductAcceptanceTest.상품_생성_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -13,10 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import kitchenpos.domain.Menu;
+import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
+import kitchenpos.menu.dto.MenuProductRequest;
+import kitchenpos.menu.dto.MenuResponse;
 import kitchenpos.product.domain.Product;
+import kitchenpos.product.dto.ProductResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,14 +29,14 @@ import org.springframework.http.MediaType;
 public class MenuAcceptanceTest extends AcceptanceTest {
 
     private MenuGroup 피자세트;
-    private static Product 페페로니피자;
-    private static Product 콜라;
+    private static ProductResponse 페페로니피자;
+    private static ProductResponse 콜라;
 
     @BeforeEach
     public void setUp() {
         피자세트 = 메뉴_그룹_생성_요청("피자세트").as(MenuGroup.class);
-        페페로니피자 = 상품_생성_요청("페페로니피자", BigDecimal.valueOf(20_000L)).as(Product.class);
-        콜라 = 상품_생성_요청("콜라", BigDecimal.valueOf(2_000L)).as(Product.class);
+        페페로니피자 = 상품_생성_요청("페페로니피자", BigDecimal.valueOf(20_000L)).as(ProductResponse.class);
+        콜라 = 상품_생성_요청("콜라", BigDecimal.valueOf(2_000L)).as(ProductResponse.class);
     }
 
     /**
@@ -98,7 +100,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         메뉴_생성_실패됨(그룹없음);
 
         //given
-        Product 존재하지_않는_상품 = new Product(null, null, null);
+        ProductResponse 존재하지_않는_상품 = ProductResponse.from(new Product(Long.MAX_VALUE, "noExistProduct", BigDecimal.valueOf(1L)));
         // when
         ExtractableResponse<Response> 없는상품 = 메뉴_생성_요청("페페로니피자, 콜라",
                 BigDecimal.valueOf(15_000L), 피자세트.getId(), 존재하지_않는_상품);
@@ -122,12 +124,12 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
 
     public static ExtractableResponse<Response> 메뉴_생성_요청(String name, BigDecimal price, Long menuGroupId,
-                                                         Product... products) {
+                                                         ProductResponse... productResponse) {
         Map<String, Object> request = new HashMap<>();
         request.put("name", name);
         request.put("price", price);
         request.put("menuGroupId", menuGroupId);
-        request.put("menuProducts", toMenuProducts(products));
+        request.put("menuProducts", toMenuProducts(productResponse));
         return RestAssured
                 .given().log().all()
                 .body(request)
@@ -137,14 +139,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private static List<MenuProduct> toMenuProducts(Product... products) {
-        return Arrays.stream(products)
-                .map(p -> {
-                    MenuProduct menuProduct = new MenuProduct();
-                    menuProduct.setProductId(p.getId());
-                    menuProduct.setQuantity(1L);
-                    return menuProduct;
-                }).collect(Collectors.toList());
+    private static List<MenuProductRequest> toMenuProducts(ProductResponse... productResponses) {
+        return Arrays.stream(productResponses)
+                .map(p -> new MenuProductRequest(p.getId(), 1))
+                .collect(Collectors.toList());
     }
 
     public static ExtractableResponse<Response> 메뉴_목록_조회_요청() {
@@ -164,24 +162,24 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     }
 
     public static void 메뉴_목록_확인됨(ExtractableResponse<Response> response, String... names) {
-        List<Menu> menus = response.jsonPath().getList(".", Menu.class);
+        List<MenuResponse> menus = response.jsonPath().getList(".", MenuResponse.class);
 
         List<String> productNames = menus.stream()
-                .map(Menu::getName)
+                .map(MenuResponse::getName)
                 .collect(Collectors.toList());
         assertThat(productNames).containsExactly(names);
     }
 
-    public static void 메뉴_목록_메뉴에_메뉴_상품이_포함됨(ExtractableResponse<Response> response, Product... products) {
-        List<Menu> menus = response.jsonPath().getList(".", Menu.class);
+    public static void 메뉴_목록_메뉴에_메뉴_상품이_포함됨(ExtractableResponse<Response> response, ProductResponse... productResponses) {
+        List<MenuResponse> menuResponses = response.jsonPath().getList(".", MenuResponse.class);
 
-        List<Long> actualProductIds = menus.stream()
+        List<Long> actualProductIds = menuResponses.stream()
                 .flatMap(menu -> menu.getMenuProducts().stream())
-                .map(MenuProduct::getProductId)
+                .map(x -> x.getProductId())
                 .collect(Collectors.toList());
 
-        List<Long> expectedProductIds = Arrays.stream(products)
-                .map(Product::getId)
+        List<Long> expectedProductIds = Arrays.stream(productResponses)
+                .map(ProductResponse::getId)
                 .collect(Collectors.toList());
 
         assertThat(actualProductIds).containsExactlyElementsOf(expectedProductIds);

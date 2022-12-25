@@ -1,7 +1,7 @@
 package kitchenpos;
 
-import static kitchenpos.OrderAcceptanceTest.메뉴_등록_요청;
 import static kitchenpos.OrderAcceptanceTest.주문_생성_요청;
+import static kitchenpos.OrderAcceptanceTest.페페로니피자_등록_요청;
 import static kitchenpos.TableAcceptanceTest.테이블_생성_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -11,9 +11,9 @@ import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.TableGroup;
+import kitchenpos.menu.dto.MenuResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -99,7 +99,7 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 신규단체지정 = 단체_지정_생성_요청(테이블3, 테이블4);
         TableGroup 단체_지정2 = 신규단체지정.as(TableGroup.class);
         // when
-        주문_생성_요청(테이블3, 메뉴_등록_요청().as(Menu.class));
+        주문_생성_요청(테이블3, 페페로니피자_등록_요청().as(MenuResponse.class));
         ExtractableResponse<Response> response = 단체_지정_해지_요청(단체_지정2);
 
         단체_지정_해지_실패됨(response);

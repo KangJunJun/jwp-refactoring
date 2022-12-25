@@ -1,4 +1,4 @@
-package kitchenpos;
+package kitchenpos.menu;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -7,6 +7,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
 import java.util.stream.Collectors;
+import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.menu.dto.MenuGroupRequest;
 import org.junit.jupiter.api.DisplayName;

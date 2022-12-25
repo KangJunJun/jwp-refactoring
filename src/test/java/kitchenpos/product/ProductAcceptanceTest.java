@@ -1,4 +1,4 @@
-package kitchenpos;
+package kitchenpos.product;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -8,6 +8,7 @@ import io.restassured.response.Response;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import kitchenpos.AcceptanceTest;
 import kitchenpos.product.domain.Product;
 import kitchenpos.product.dto.ProductRequest;
 import org.junit.jupiter.api.DisplayName;

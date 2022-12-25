@@ -1,9 +1,9 @@
 package kitchenpos;
 
-import static kitchenpos.MenuAcceptanceTest.메뉴_생성_요청;
-import static kitchenpos.MenuGroupAcceptanceTest.메뉴_그룹_생성_요청;
-import static kitchenpos.ProductAcceptanceTest.상품_생성_요청;
 import static kitchenpos.TableAcceptanceTest.테이블_생성_요청;
+import static kitchenpos.menu.MenuAcceptanceTest.메뉴_생성_요청;
+import static kitchenpos.menu.MenuGroupAcceptanceTest.메뉴_그룹_생성_요청;
+import static kitchenpos.product.ProductAcceptanceTest.상품_생성_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -15,13 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import kitchenpos.domain.Menu;
-import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
-import kitchenpos.product.domain.Product;
+import kitchenpos.menu.domain.Menu;
+import kitchenpos.menu.domain.MenuGroup;
+import kitchenpos.menu.dto.MenuResponse;
+import kitchenpos.product.dto.ProductResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,13 +34,15 @@ public class OrderAcceptanceTest extends AcceptanceTest {
 
     private OrderTable 빈_테이블;
     private OrderTable 테이블;
-    private Menu 페페로니피자;
+    private MenuResponse 페페로니피자;
 
     @BeforeEach
     public void setUp() {
         테이블 = 테이블_생성_요청(false, 5).as(OrderTable.class);
         빈_테이블 = 테이블_생성_요청(true, 0).as(OrderTable.class);
-        페페로니피자 = 메뉴_등록_요청().as(Menu.class);
+
+
+        페페로니피자 = 페페로니피자_등록_요청().as(MenuResponse.class);
     }
 
     /**
@@ -82,10 +85,9 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         주문_생성_실패됨(메뉴없이주문);
 
         // given
-        Menu 없는메뉴 = new Menu();
-        없는메뉴.setId(Long.MAX_VALUE);
+        Menu 없는메뉴 = new Menu(Long.MAX_VALUE);
         // when
-        ExtractableResponse<Response> 없는메뉴주문 = 주문_생성_요청(테이블, 없는메뉴);
+        ExtractableResponse<Response> 없는메뉴주문 = 주문_생성_요청(테이블, MenuResponse.from(없는메뉴));
         // then
         주문_생성_실패됨(없는메뉴주문);
 
@@ -113,10 +115,10 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         주문_상태_변경_실패됨(없는상태변경);
     }
 
-    public static ExtractableResponse<Response> 주문_생성_요청(OrderTable orderTable, Menu... menus) {
+    public static ExtractableResponse<Response> 주문_생성_요청(OrderTable orderTable, MenuResponse... menuResponses) {
         Map<String, Object> request = new HashMap<>();
         request.put("orderTableId", orderTable.getId());
-        request.put("orderLineItems", toOrderLoneItems(menus));
+        request.put("orderLineItems", toOrderLoneItems(menuResponses));
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -126,7 +128,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private static List<OrderLineItem> toOrderLoneItems(Menu[] menus) {
+    private static List<OrderLineItem> toOrderLoneItems(MenuResponse[] menus) {
         return Arrays.stream(menus)
                 .map(m -> {
                     OrderLineItem orderLineItem = new OrderLineItem();
@@ -178,25 +180,27 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    public static void 주문_목록_주문에_주문_항목이_포함됨(ExtractableResponse<Response> response, Menu... menus) {
+    public static void 주문_목록_주문에_주문_항목이_포함됨(ExtractableResponse<Response> response, MenuResponse... menuResponses) {
         List<Long> menuIds = response.jsonPath().getList(".", Order.class)
                 .stream()
                 .flatMap(o -> o.getOrderLineItems().stream())
                 .map(OrderLineItem::getMenuId)
                 .collect(Collectors.toList());
 
-        List<Long> expectedIds = Arrays.stream(menus)
-                .map(Menu::getId)
+        List<Long> expectedIds = Arrays.stream(menuResponses)
+                .map(MenuResponse::getId)
                 .collect(Collectors.toList());
         assertThat(menuIds).containsExactlyElementsOf(expectedIds);
     }
 
-    public static ExtractableResponse<Response> 메뉴_등록_요청() {
+    public static ExtractableResponse<Response> 페페로니피자_등록_요청() {
         MenuGroup 신메뉴 = 메뉴_그룹_생성_요청("신메뉴").as(MenuGroup.class);
-        Product 파닭치킨 = 상품_생성_요청("파닭치킨", BigDecimal.valueOf(15_000L)).as(Product.class);
+        ProductResponse 페페로니피자 = 상품_생성_요청("페페로니피자", BigDecimal.valueOf(15_000L)).as(ProductResponse.class);
 
-        return 메뉴_생성_요청("파닭치킨",
+        return 메뉴_생성_요청("페페로니피자",
                 BigDecimal.valueOf(15_000L),
-                신메뉴.getId(), 파닭치킨);
+                신메뉴.getId(), 페페로니피자);
+
+
     }
 }
