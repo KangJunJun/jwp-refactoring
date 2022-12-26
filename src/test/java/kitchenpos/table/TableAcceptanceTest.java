@@ -1,7 +1,7 @@
-package kitchenpos;
+package kitchenpos.table;
 
-import static kitchenpos.OrderAcceptanceTest.주문_생성_요청;
-import static kitchenpos.OrderAcceptanceTest.페페로니피자_등록_요청;
+import static kitchenpos.order.OrderAcceptanceTest.주문_생성_요청;
+import static kitchenpos.order.OrderAcceptanceTest.페페로니피자_등록_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -12,8 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import kitchenpos.domain.OrderTable;
+import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.dto.MenuResponse;
+import kitchenpos.table.dto.OrderTableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -55,13 +56,13 @@ public class TableAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 테이블_생성_요청(true, 0);
         // then
         테이블_생성됨(response);
-        OrderTable 빈_테이블 = response.as(OrderTable.class);
+        OrderTableResponse 빈_테이블 = response.as(OrderTableResponse.class);
 
         // when
         ExtractableResponse<Response> 테이블 = 테이블_생성_요청(false, 5);
         // then
         테이블_생성됨(테이블);
-        OrderTable 손님이_있는_테이블 = 테이블.as(OrderTable.class);
+        OrderTableResponse 손님이_있는_테이블 = 테이블.as(OrderTableResponse.class);
 
         // when
         ExtractableResponse<Response> 조회 = 테이블_목록_조회_요청();
@@ -78,11 +79,9 @@ public class TableAcceptanceTest extends AcceptanceTest {
         // then
         테이블_손님_수_변경_실패됨(순님음수변경);
 
-        // given
-        OrderTable 없는테이블 = new OrderTable();
-        없는테이블.setId(Long.MAX_VALUE);
         // when
-        ExtractableResponse<Response> 없는테이블변경 = 테이블_손님_수_변경_요청(없는테이블, 5);
+        OrderTableResponse 존재하지_않는_테이블 = new OrderTableResponse(Long.MAX_VALUE, 0L, 0, true);
+        ExtractableResponse<Response> 없는테이블변경 = 테이블_손님_수_변경_요청(존재하지_않는_테이블, 5);
         // then
         테이블_손님_수_변경_실패됨(없는테이블변경);
 
@@ -98,7 +97,7 @@ public class TableAcceptanceTest extends AcceptanceTest {
         //테이블_비움_여부_변경됨(단체테이블변경);
 
         // when
-        OrderTable 주문이_들어간_테이블 = 주문이_들어간_테이블_가져오기();
+        OrderTableResponse 주문이_들어간_테이블 = 주문이_들어간_테이블_가져오기();
         ExtractableResponse<Response> 주문테이블변경 = 테이블_비움_여부_변경_요청(주문이_들어간_테이블, true);
         // then
         테이블_비움_여부_변경_실패됨(주문테이블변경);
@@ -128,7 +127,7 @@ public class TableAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 테이블_손님_수_변경_요청(OrderTable orderTable, int numberOfGuests) {
+    public static ExtractableResponse<Response> 테이블_손님_수_변경_요청(OrderTableResponse orderTable, int numberOfGuests) {
         Map<String, Object> request = new HashMap<>();
         request.put("numberOfGuests", numberOfGuests);
 
@@ -141,7 +140,7 @@ public class TableAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 테이블_비움_여부_변경_요청(OrderTable orderTable, boolean empty) {
+    public static ExtractableResponse<Response> 테이블_비움_여부_변경_요청(OrderTableResponse orderTable, boolean empty) {
         Map<String, Object> request = new HashMap<>();
         request.put("empty", empty);
 
@@ -158,14 +157,14 @@ public class TableAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    public static void 테이블_목록_응답됨(ExtractableResponse<Response> response, OrderTable... orderTables) {
-        List<Long> orderTableIds = response.jsonPath().getList(".", OrderTable.class)
+    public static void 테이블_목록_응답됨(ExtractableResponse<Response> response, OrderTableResponse... orderTables) {
+        List<Long> orderTableIds = response.jsonPath().getList(".", OrderTableResponse.class)
                 .stream()
-                .map(OrderTable::getId)
+                .map(OrderTableResponse::getId)
                 .collect(Collectors.toList());
 
         List<Long> expectedIds = Arrays.stream(orderTables)
-                .map(OrderTable::getId)
+                .map(OrderTableResponse::getId)
                 .collect(Collectors.toList());
 
         assertThat(orderTableIds).containsExactlyElementsOf(expectedIds);
@@ -187,8 +186,8 @@ public class TableAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    public static OrderTable 주문이_들어간_테이블_가져오기() {
-        OrderTable 주문이_들어간_테이블 = 테이블_생성_요청(false, 5).as(OrderTable.class);
+    public static OrderTableResponse 주문이_들어간_테이블_가져오기() {
+        OrderTableResponse 주문이_들어간_테이블 = 테이블_생성_요청(false, 5).as(OrderTableResponse.class);
         MenuResponse 등록된_메뉴 = 페페로니피자_등록_요청().as(MenuResponse.class);
 
         주문_생성_요청(주문이_들어간_테이블, 등록된_메뉴);

@@ -1,8 +1,8 @@
-package kitchenpos;
+package kitchenpos.table;
 
-import static kitchenpos.OrderAcceptanceTest.주문_생성_요청;
-import static kitchenpos.OrderAcceptanceTest.페페로니피자_등록_요청;
-import static kitchenpos.TableAcceptanceTest.테이블_생성_요청;
+import static kitchenpos.order.OrderAcceptanceTest.주문_생성_요청;
+import static kitchenpos.order.OrderAcceptanceTest.페페로니피자_등록_요청;
+import static kitchenpos.table.TableAcceptanceTest.테이블_생성_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -11,9 +11,10 @@ import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.TableGroup;
+import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.dto.MenuResponse;
+import kitchenpos.table.domain.TableGroup;
+import kitchenpos.table.dto.OrderTableResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,17 +23,18 @@ import org.springframework.http.MediaType;
 
 @DisplayName("단체 지정 관련 기능")
 public class TableGroupAcceptanceTest extends AcceptanceTest {
-    private OrderTable 테이블1;
-    private OrderTable 테이블2;
-    private OrderTable 테이블3;
-    private OrderTable 테이블4;
+    private OrderTableResponse 테이블1;
+    private OrderTableResponse 테이블2;
+    private OrderTableResponse 테이블3;
+    private OrderTableResponse 테이블4;
+    private OrderTableResponse 주문이_들어간_테이블;
 
     @BeforeEach
     public void setUp() {
-        테이블1 = 테이블_생성_요청(true, 0).as(OrderTable.class);
-        테이블2 = 테이블_생성_요청(true, 0).as(OrderTable.class);
-        테이블3 = 테이블_생성_요청(true, 0).as(OrderTable.class);
-        테이블4 = 테이블_생성_요청(true, 0).as(OrderTable.class);
+        테이블1 = 테이블_생성_요청(true, 0).as(OrderTableResponse.class);
+        테이블2 = 테이블_생성_요청(true, 0).as(OrderTableResponse.class);
+        테이블3 = 테이블_생성_요청(true, 0).as(OrderTableResponse.class);
+        테이블4 = 테이블_생성_요청(true, 0).as(OrderTableResponse.class);
     }
 
     /**
@@ -69,7 +71,7 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
         TableGroup 단체_지정1 = 단체지정생성.as(TableGroup.class);
 
         // when
-        ExtractableResponse<Response> 주문된테이블_단체지정 = 단체_지정_생성_요청(new OrderTable(), 테이블3);
+        ExtractableResponse<Response> 주문된테이블_단체지정 = 단체_지정_생성_요청(주문이_들어간_테이블, 테이블3);
         // then
         단체_지정_생성_실패됨(주문된테이블_단체지정);
 
@@ -79,9 +81,8 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
 
 
         // when
-        OrderTable 없는테이블 = new OrderTable();
-        없는테이블.setId(Long.MAX_VALUE);
-        ExtractableResponse<Response> 없는테이블단체지정 = 단체_지정_생성_요청(테이블4, 없는테이블);
+        OrderTableResponse 존재하지_않는_테이블 = new OrderTableResponse(Long.MAX_VALUE, 0L, 0, true);
+        ExtractableResponse<Response> 없는테이블단체지정 = 단체_지정_생성_요청(테이블4, 존재하지_않는_테이블);
         // then
         단체_지정_생성_실패됨(없는테이블단체지정);
 
@@ -105,7 +106,7 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
         단체_지정_해지_실패됨(response);
     }
 
-    public static ExtractableResponse<Response> 단체_지정_생성_요청(OrderTable... orderTables) {
+    public static ExtractableResponse<Response> 단체_지정_생성_요청(OrderTableResponse... orderTables) {
         Map<String, Object> request = new HashMap<>();
         request.put("orderTables", Arrays.asList(orderTables));
         return RestAssured

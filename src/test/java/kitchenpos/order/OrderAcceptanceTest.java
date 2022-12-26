@@ -1,4 +1,4 @@
-package kitchenpos;
+package kitchenpos.order;
 
 import static kitchenpos.menu.MenuAcceptanceTest.메뉴_생성_요청;
 import static kitchenpos.menu.MenuGroupAcceptanceTest.메뉴_그룹_생성_요청;
@@ -16,13 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import kitchenpos.AcceptanceTest;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
 import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.menu.dto.MenuResponse;
 import kitchenpos.product.dto.ProductResponse;
+import kitchenpos.table.dto.OrderTableResponse;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,14 +34,14 @@ import org.springframework.http.MediaType;
 @DisplayName("주문 관련 기능")
 public class OrderAcceptanceTest extends AcceptanceTest {
 
-    private OrderTable 빈_테이블;
-    private OrderTable 테이블;
+    private OrderTableResponse 빈_테이블;
+    private OrderTableResponse 테이블;
     private MenuResponse 페페로니피자;
 
     @BeforeEach
     public void setUp() {
-        테이블 = 테이블_생성_요청(false, 5).as(OrderTable.class);
-        빈_테이블 = 테이블_생성_요청(true, 0).as(OrderTable.class);
+        테이블 = 테이블_생성_요청(false, 5).as(OrderTableResponse.class);
+        빈_테이블 = 테이블_생성_요청(true, 0).as(OrderTableResponse.class);
 
 
         페페로니피자 = 페페로니피자_등록_요청().as(MenuResponse.class);
@@ -114,7 +115,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         주문_상태_변경_실패됨(없는상태변경);
     }
 
-    public static ExtractableResponse<Response> 주문_생성_요청(OrderTable orderTable, MenuResponse... menuResponses) {
+    public static ExtractableResponse<Response> 주문_생성_요청(OrderTableResponse orderTable, MenuResponse... menuResponses) {
         Map<String, Object> request = new HashMap<>();
         request.put("orderTableId", orderTable.getId());
         request.put("orderLineItems", toOrderLoneItems(menuResponses));
