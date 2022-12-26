@@ -27,10 +27,6 @@ public class Menu {
     protected Menu() {
     }
 
-    public Menu(Long id) {
-        this.id = id;
-    }
-
     public Menu(String name, BigDecimal price, Long menuGroupId) {
         validateName(name);
         validatePrice(price);

@@ -1,9 +1,9 @@
 package kitchenpos;
 
-import static kitchenpos.TableAcceptanceTest.테이블_생성_요청;
 import static kitchenpos.menu.MenuAcceptanceTest.메뉴_생성_요청;
 import static kitchenpos.menu.MenuGroupAcceptanceTest.메뉴_그룹_생성_요청;
 import static kitchenpos.product.ProductAcceptanceTest.상품_생성_요청;
+import static kitchenpos.table.TableAcceptanceTest.테이블_생성_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -11,6 +11,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +20,10 @@ import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
-import kitchenpos.menu.domain.Menu;
 import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.menu.dto.MenuResponse;
 import kitchenpos.product.dto.ProductResponse;
+import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,10 +85,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         // then
         주문_생성_실패됨(메뉴없이주문);
 
-        // given
-        Menu 없는메뉴 = new Menu(Long.MAX_VALUE);
         // when
-        ExtractableResponse<Response> 없는메뉴주문 = 주문_생성_요청(테이블, MenuResponse.from(없는메뉴));
+        ExtractableResponse<Response> 없는메뉴주문 = 주문_생성_요청(테이블, null);
         // then
         주문_생성_실패됨(없는메뉴주문);
 
@@ -129,6 +128,10 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     }
 
     private static List<OrderLineItem> toOrderLoneItems(MenuResponse[] menus) {
+        if (ObjectUtils.isEmpty(menus)) {
+            return Collections.emptyList();
+        }
+
         return Arrays.stream(menus)
                 .map(m -> {
                     OrderLineItem orderLineItem = new OrderLineItem();
