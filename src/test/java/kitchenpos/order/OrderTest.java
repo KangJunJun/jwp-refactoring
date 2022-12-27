@@ -1,6 +1,6 @@
 package kitchenpos.order;
 
-import kitchenpos.domain.Order;
+import kitchenpos.order.domain.Order;
 import org.junit.jupiter.api.Test;
 
 class OrderTest {
