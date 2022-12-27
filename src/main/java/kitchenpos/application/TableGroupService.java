@@ -10,6 +10,9 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.table.domain.OrderTable;
 import kitchenpos.table.domain.OrderTableRepository;
 import kitchenpos.table.domain.TableGroup;
+import kitchenpos.table.dto.OrderTableResponse;
+import kitchenpos.table.dto.TableGroupRequest;
+import kitchenpos.table.dto.TableGroupResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -27,15 +30,15 @@ public class TableGroupService {
     }
 
     @Transactional
-    public TableGroup create(final TableGroup tableGroup) {
-        final List<OrderTable> orderTables = tableGroup.getOrderTables();
+    public TableGroupResponse create(final TableGroupRequest tableGroup) {
+        final List<OrderTableResponse> orderTables = tableGroup.getOrderTables();
 
         if (CollectionUtils.isEmpty(orderTables) || orderTables.size() < 2) {
             throw new IllegalArgumentException();
         }
 
         final List<Long> orderTableIds = orderTables.stream()
-                .map(OrderTable::getId)
+                .map(OrderTableResponse::getId)
                 .collect(Collectors.toList());
 
         final List<OrderTable> savedOrderTables = orderTableRepository.findAllByIdIn(orderTableIds);
@@ -50,7 +53,7 @@ public class TableGroupService {
             }
         }
 
-        final TableGroup savedTableGroup = tableGroupDao.save(tableGroup);
+        final TableGroup savedTableGroup = tableGroupDao.save(new TableGroup());
 
         for (final OrderTable savedOrderTable : savedOrderTables) {
             savedOrderTable.bindTo(savedTableGroup);
@@ -58,7 +61,7 @@ public class TableGroupService {
         }
         savedTableGroup.addOrderTables(savedOrderTables);
 
-        return savedTableGroup;
+        return TableGroupResponse.of(savedTableGroup);
     }
 
     @Transactional
