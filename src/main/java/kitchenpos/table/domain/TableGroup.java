@@ -15,7 +15,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class TableGroup {
-
     private static final int MIN_SIZE = 2;
 
     @Id
@@ -28,6 +27,15 @@ public class TableGroup {
 
     public TableGroup() {
         this.createdDate = LocalDateTime.now();
+    }
+
+    private TableGroup (List<OrderTable> orderTables) {
+        this.createdDate = LocalDateTime.now();
+        addOrderTables(orderTables);
+    }
+
+    public TableGroup from(List<OrderTable> orderTables) {
+        return new TableGroup(orderTables);
     }
 
     public void addOrderTables(List<OrderTable> orderTables) {
@@ -46,7 +54,7 @@ public class TableGroup {
     }
 
     private boolean hasNotEmptyOrGrouped(List<OrderTable> orderTables) {
-        return orderTables.stream().anyMatch(it -> !it.isEmpty() || it.isGrouped2());
+        return orderTables.stream().anyMatch(it -> !it.isEmpty() || it.isGrouped());
     }
 
     public void ungroup() {

@@ -1,7 +1,7 @@
-package kitchenpos.menu.product.dto;
+package kitchenpos.product.dto;
 
 import java.math.BigDecimal;
-import kitchenpos.menu.product.domain.Product;
+import kitchenpos.product.domain.Product;
 
 public class ProductResponse {
     private final Long id;
