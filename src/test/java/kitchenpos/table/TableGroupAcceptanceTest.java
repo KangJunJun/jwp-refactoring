@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.dto.MenuResponse;
-import kitchenpos.table.domain.TableGroup;
 import kitchenpos.table.dto.OrderTableResponse;
+import kitchenpos.table.dto.TableGroupResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,7 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 단체지정생성 = 단체_지정_생성_요청(테이블1, 테이블2);
         // then
         단체_지정_생성됨(단체지정생성);
-        TableGroup 단체_지정1 = 단체지정생성.as(TableGroup.class);
+        TableGroupResponse 단체_지정1 = 단체지정생성.as(TableGroupResponse.class);
 
         // when
         ExtractableResponse<Response> 주문된테이블_단체지정 = 단체_지정_생성_요청(주문이_들어간_테이블, 테이블3);
@@ -98,7 +98,7 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
 
         // given
         ExtractableResponse<Response> 신규단체지정 = 단체_지정_생성_요청(테이블3, 테이블4);
-        TableGroup 단체_지정2 = 신규단체지정.as(TableGroup.class);
+        TableGroupResponse 단체_지정2 = 신규단체지정.as(TableGroupResponse.class);
         // when
         주문_생성_요청(테이블3, 페페로니피자_등록_요청().as(MenuResponse.class));
         ExtractableResponse<Response> response = 단체_지정_해지_요청(단체_지정2);
@@ -118,7 +118,7 @@ public class TableGroupAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 단체_지정_해지_요청(TableGroup tableGroup) {
+    public static ExtractableResponse<Response> 단체_지정_해지_요청(TableGroupResponse tableGroup) {
         return RestAssured
                 .given().log().all()
                 .when().delete("/api/table-groups/{tableGroupId}", tableGroup.getId())

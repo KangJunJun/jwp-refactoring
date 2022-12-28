@@ -22,7 +22,7 @@ import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.menu.dto.MenuResponse;
-import kitchenpos.menu.product.dto.ProductResponse;
+import kitchenpos.product.dto.ProductResponse;
 import kitchenpos.table.dto.OrderTableResponse;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;

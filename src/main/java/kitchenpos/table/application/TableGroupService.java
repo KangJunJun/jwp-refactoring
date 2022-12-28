@@ -2,15 +2,13 @@ package kitchenpos.table.application;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.TableGroupDao;
 import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.table.domain.OrderTable;
 import kitchenpos.table.domain.OrderTableRepository;
 import kitchenpos.table.domain.TableGroup;
-import kitchenpos.table.dto.OrderTableResponse;
+import kitchenpos.table.domain.TableGroupRepository;
 import kitchenpos.table.dto.TableGroupRequest;
 import kitchenpos.table.dto.TableGroupResponse;
 import org.springframework.stereotype.Service;
@@ -21,47 +19,43 @@ import org.springframework.util.CollectionUtils;
 public class TableGroupService {
     private final OrderDao orderDao;
     private final OrderTableRepository orderTableRepository;
-    private final TableGroupDao tableGroupDao;
+    private final TableGroupRepository tableGroupRepository;
 
-    public TableGroupService(final OrderDao orderDao, final OrderTableRepository orderTableRepository, final TableGroupDao tableGroupDao) {
+    public TableGroupService(final OrderDao orderDao, final OrderTableRepository orderTableRepository, TableGroupRepository tableGroupRepository) {
         this.orderDao = orderDao;
         this.orderTableRepository = orderTableRepository;
-        this.tableGroupDao = tableGroupDao;
+        this.tableGroupRepository = tableGroupRepository;
     }
 
     @Transactional
     public TableGroupResponse create(final TableGroupRequest tableGroup) {
-        final List<OrderTableResponse> orderTables = tableGroup.getOrderTables();
-
-        if (CollectionUtils.isEmpty(orderTables) || orderTables.size() < 2) {
-            throw new IllegalArgumentException();
-        }
-
-        final List<Long> orderTableIds = orderTables.stream()
-                .map(OrderTableResponse::getId)
-                .collect(Collectors.toList());
-
-        final List<OrderTable> savedOrderTables = orderTableRepository.findAllByIdIn(orderTableIds);
-
-        if (orderTables.size() != savedOrderTables.size()) {
-            throw new IllegalArgumentException();
-        }
-
-        for (final OrderTable savedOrderTable : savedOrderTables) {
-            if (!savedOrderTable.isEmpty() || Objects.nonNull(savedOrderTable.getTableGroup())) {
-                throw new IllegalArgumentException();
-            }
-        }
-
-        final TableGroup savedTableGroup = tableGroupDao.save(new TableGroup());
-
-        for (final OrderTable savedOrderTable : savedOrderTables) {
-            savedOrderTable.bindTo(savedTableGroup);
-            orderTableRepository.save(savedOrderTable);
-        }
-        savedTableGroup.addOrderTables(savedOrderTables);
-
+        List<OrderTable> orderTables = validateCreate(tableGroup);
+        TableGroup savedTableGroup = tableGroupRepository.save(new TableGroup());
+        savedTableGroup.addOrderTables(orderTables);
         return TableGroupResponse.of(savedTableGroup);
+    }
+
+
+    private List<OrderTable> validateCreate(TableGroupRequest request) {
+        List<Long> orderTableIds = validateNotEmptyIds(request);
+        return validateExistsAllOrderTables(orderTableIds);
+    }
+
+
+    private List<OrderTable> validateExistsAllOrderTables(List<Long> orderTableIds) {
+        List<OrderTable> orderTables = orderTableRepository.findAllByIdIn(orderTableIds);
+        if (orderTableIds.size() != orderTables.size()) {
+            throw new IllegalArgumentException("존재하지 않는 테이블이 있습니다.");
+        }
+        return orderTables;
+    }
+
+    private List<Long> validateNotEmptyIds(TableGroupRequest request) {
+        List<Long> orderTableIds = request.toOrderTableId();
+        if (CollectionUtils.isEmpty(orderTableIds)) {
+            throw new IllegalArgumentException("단체 지정할 테이블이 없습니다.");
+        }
+        return orderTableIds;
     }
 
     @Transactional

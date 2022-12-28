@@ -18,7 +18,7 @@ public class OrderTable {
     private boolean empty;
 
     public OrderTable(){
-    };
+    }
 
     public OrderTable(int numberOfGuests, boolean empty) {
         this.numberOfGuests = numberOfGuests;
@@ -50,12 +50,12 @@ public class OrderTable {
         tableGroup = null;
     }
 
-    public boolean isGrouped2() {
+    public boolean isGrouped() {
         return tableGroup != null;
     }
 
     public void changeEmpty(boolean empty) {
-        if (isGrouped2()) {
+        if (isGrouped()) {
             throw new IllegalStateException("주문 테이블의 상태를 변경할 수 없습니다.");
         }
         this.empty = empty;
