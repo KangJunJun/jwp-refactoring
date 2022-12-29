@@ -1,4 +1,4 @@
-package kitchenpos.table.domain;
+package kitchenpos.ordertable.domain;
 
 import static java.util.Objects.requireNonNull;
 
@@ -8,13 +8,14 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import kitchenpos.tablegroup.domain.TableGroup;
 
 @Embeddable
 public class OrderTables {
     @OneToMany(mappedBy = "tableGroup", cascade = CascadeType.ALL)
     private List<OrderTable> orderTables = new ArrayList<>();
 
-    protected OrderTables() {
+    public OrderTables() {
     }
 
     public void addAll(TableGroup tableGroup, List<OrderTable> orderTables) {

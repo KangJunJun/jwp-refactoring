@@ -1,6 +1,7 @@
-package kitchenpos.table.domain;
+package kitchenpos.ordertable.domain;
 
 import javax.persistence.*;
+import kitchenpos.tablegroup.domain.TableGroup;
 
 @Entity
 public class OrderTable {
@@ -17,7 +18,7 @@ public class OrderTable {
     @Column(nullable = false)
     private boolean empty;
 
-    public OrderTable(){
+    protected OrderTable(){
     }
 
     public OrderTable(int numberOfGuests, boolean empty) {
@@ -62,6 +63,10 @@ public class OrderTable {
     }
 
     public void changeNumberOfGuests(int numberOfGuests) {
+        if (numberOfGuests < 0) {
+            throw new IllegalArgumentException("손님수는 음수일 수 없습니다.");
+        }
+        
         if (isEmpty()) {
             throw new IllegalStateException("인원수를 변경할 수 없습니다.");
         }

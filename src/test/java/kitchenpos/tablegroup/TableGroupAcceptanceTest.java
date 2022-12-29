@@ -1,8 +1,8 @@
-package kitchenpos.table;
+package kitchenpos.tablegroup;
 
 import static kitchenpos.order.OrderAcceptanceTest.주문_생성_요청;
 import static kitchenpos.order.OrderAcceptanceTest.페페로니피자_등록_요청;
-import static kitchenpos.table.TableAcceptanceTest.테이블_생성_요청;
+import static kitchenpos.tablegroup.TableAcceptanceTest.테이블_생성_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.dto.MenuResponse;
-import kitchenpos.table.dto.OrderTableResponse;
-import kitchenpos.table.dto.TableGroupResponse;
+import kitchenpos.ordertable.dto.OrderTableResponse;
+import kitchenpos.tablegroup.dto.TableGroupResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

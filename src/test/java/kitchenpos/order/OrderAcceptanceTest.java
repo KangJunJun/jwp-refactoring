@@ -3,7 +3,7 @@ package kitchenpos.order;
 import static kitchenpos.menu.MenuAcceptanceTest.메뉴_생성_요청;
 import static kitchenpos.menu.MenuGroupAcceptanceTest.메뉴_그룹_생성_요청;
 import static kitchenpos.product.ProductAcceptanceTest.상품_생성_요청;
-import static kitchenpos.table.TableAcceptanceTest.테이블_생성_요청;
+import static kitchenpos.tablegroup.TableAcceptanceTest.테이블_생성_요청;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import io.restassured.RestAssured;
@@ -23,7 +23,7 @@ import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.menu.dto.MenuResponse;
 import kitchenpos.product.dto.ProductResponse;
-import kitchenpos.table.dto.OrderTableResponse;
+import kitchenpos.ordertable.dto.OrderTableResponse;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
