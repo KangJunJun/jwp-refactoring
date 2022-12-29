@@ -1,4 +1,4 @@
-package kitchenpos.table;
+package kitchenpos.tablegroup;
 
 import static kitchenpos.order.OrderAcceptanceTest.주문_생성_요청;
 import static kitchenpos.order.OrderAcceptanceTest.페페로니피자_등록_요청;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.dto.MenuResponse;
-import kitchenpos.table.dto.OrderTableResponse;
+import kitchenpos.ordertable.dto.OrderTableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

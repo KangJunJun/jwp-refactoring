@@ -1,9 +1,9 @@
-package kitchenpos.table.ui;
+package kitchenpos.ordertable.ui;
 
-import kitchenpos.table.application.TableService;
-import kitchenpos.table.domain.OrderTable;
-import kitchenpos.table.dto.OrderTableRequest;
-import kitchenpos.table.dto.OrderTableResponse;
+import kitchenpos.ordertable.applictaion.OrderTableService;
+import kitchenpos.ordertable.domain.OrderTable;
+import kitchenpos.ordertable.dto.OrderTableRequest;
+import kitchenpos.ordertable.dto.OrderTableResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +11,10 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-public class TableRestController {
-    private final TableService tableService;
+public class OrderTableRestController {
+    private final OrderTableService tableService;
 
-    public TableRestController(final TableService tableService) {
+    public OrderTableRestController(final OrderTableService tableService) {
         this.tableService = tableService;
     }
 

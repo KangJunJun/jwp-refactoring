@@ -1,6 +1,7 @@
-package kitchenpos.table.domain;
+package kitchenpos.ordertable.domain;
 
 import javax.persistence.*;
+import kitchenpos.tablegroup.domain.TableGroup;
 
 @Entity
 public class OrderTable {
@@ -17,7 +18,7 @@ public class OrderTable {
     @Column(nullable = false)
     private boolean empty;
 
-    public OrderTable(){
+    protected OrderTable(){
     }
 
     public OrderTable(int numberOfGuests, boolean empty) {

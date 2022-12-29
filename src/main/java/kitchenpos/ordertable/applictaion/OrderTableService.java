@@ -1,23 +1,23 @@
-package kitchenpos.table.application;
+package kitchenpos.ordertable.applictaion;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.order.domain.OrderStatus;
-import kitchenpos.table.domain.OrderTable;
-import kitchenpos.table.domain.OrderTableRepository;
-import kitchenpos.table.dto.OrderTableRequest;
-import kitchenpos.table.dto.OrderTableResponse;
+import kitchenpos.ordertable.domain.OrderTable;
+import kitchenpos.ordertable.domain.OrderTableRepository;
+import kitchenpos.ordertable.dto.OrderTableRequest;
+import kitchenpos.ordertable.dto.OrderTableResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class TableService {
+public class OrderTableService {
     private final OrderDao orderDao;
     private final OrderTableRepository orderTableRepository;
 
-    public TableService(final OrderDao orderDao, final OrderTableRepository orderTableRepository) {
+    public OrderTableService(final OrderDao orderDao, final OrderTableRepository orderTableRepository) {
         this.orderDao = orderDao;
         this.orderTableRepository = orderTableRepository;
     }

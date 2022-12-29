@@ -1,4 +1,4 @@
-package kitchenpos.table.domain;
+package kitchenpos.tablegroup.domain;
 
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
@@ -10,6 +10,8 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import kitchenpos.ordertable.domain.OrderTable;
+import kitchenpos.ordertable.domain.OrderTables;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
