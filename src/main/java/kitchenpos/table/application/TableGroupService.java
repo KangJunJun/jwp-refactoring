@@ -13,7 +13,6 @@ import kitchenpos.table.dto.TableGroupRequest;
 import kitchenpos.table.dto.TableGroupResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class TableGroupService {
@@ -29,33 +28,10 @@ public class TableGroupService {
 
     @Transactional
     public TableGroupResponse create(final TableGroupRequest tableGroup) {
-        List<OrderTable> orderTables = validateCreate(tableGroup);
+        List<OrderTable> orderTables = orderTableRepository.findAllByIdIn(tableGroup.toOrderTableId());
         TableGroup savedTableGroup = tableGroupRepository.save(new TableGroup());
         savedTableGroup.addOrderTables(orderTables);
         return TableGroupResponse.of(savedTableGroup);
-    }
-
-
-    private List<OrderTable> validateCreate(TableGroupRequest request) {
-        List<Long> orderTableIds = validateNotEmptyIds(request);
-        return validateExistsAllOrderTables(orderTableIds);
-    }
-
-
-    private List<OrderTable> validateExistsAllOrderTables(List<Long> orderTableIds) {
-        List<OrderTable> orderTables = orderTableRepository.findAllByIdIn(orderTableIds);
-        if (orderTableIds.size() != orderTables.size()) {
-            throw new IllegalArgumentException("존재하지 않는 테이블이 있습니다.");
-        }
-        return orderTables;
-    }
-
-    private List<Long> validateNotEmptyIds(TableGroupRequest request) {
-        List<Long> orderTableIds = request.toOrderTableId();
-        if (CollectionUtils.isEmpty(orderTableIds)) {
-            throw new IllegalArgumentException("단체 지정할 테이블이 없습니다.");
-        }
-        return orderTableIds;
     }
 
     @Transactional
