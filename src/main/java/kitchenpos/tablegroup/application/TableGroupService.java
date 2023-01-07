@@ -1,10 +1,8 @@
 package kitchenpos.tablegroup.application;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import kitchenpos.dao.OrderDao;
-import kitchenpos.order.domain.OrderStatus;
+import kitchenpos.order.domain.Order;
+import kitchenpos.order.domain.OrderRepository;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
 import kitchenpos.tablegroup.domain.TableGroup;
@@ -16,14 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TableGroupService {
-    private final OrderDao orderDao;
+    private final OrderRepository orderRepository;
     private final OrderTableRepository orderTableRepository;
     private final TableGroupRepository tableGroupRepository;
 
-    public TableGroupService(final OrderDao orderDao, final OrderTableRepository orderTableRepository, TableGroupRepository tableGroupRepository) {
-        this.orderDao = orderDao;
+    public TableGroupService(final OrderTableRepository orderTableRepository,
+                             final TableGroupRepository tableGroupRepository, final OrderRepository orderRepository) {
         this.orderTableRepository = orderTableRepository;
         this.tableGroupRepository = tableGroupRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Transactional
@@ -36,20 +35,14 @@ public class TableGroupService {
 
     @Transactional
     public void ungroup(final Long tableGroupId) {
-        final List<OrderTable> orderTables = orderTableRepository.findAllByTableGroupId(tableGroupId);
+        TableGroup tableGroup = findTableGroupById(tableGroupId);
+        List<Order> orders = orderRepository.findAllByOrderTableIdIn(tableGroup.getOrderTableIds());
+        tableGroup.ungroup(orders);
+        tableGroupRepository.save(tableGroup);
+    }
 
-        final List<Long> orderTableIds = orderTables.stream()
-                .map(OrderTable::getId)
-                .collect(Collectors.toList());
-
-        if (orderDao.existsByOrderTableIdInAndOrderStatusIn(
-                orderTableIds, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))) {
-            throw new IllegalArgumentException();
-        }
-
-        for (final OrderTable orderTable : orderTables) {
-            orderTable.unbind();
-            orderTableRepository.save(orderTable);
-        }
+    private TableGroup findTableGroupById(Long id) {
+        return tableGroupRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 테이블 그룹이 존재하지 않습니다."));
     }
 }

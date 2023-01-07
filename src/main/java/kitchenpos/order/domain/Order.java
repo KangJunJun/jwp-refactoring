@@ -22,6 +22,8 @@ public class Order {
 
     @CreatedDate
     private LocalDateTime orderedTime;
+
+    @OneToMany(fetch = FetchType.LAZY)
     private List<OrderLineItem> orderLineItems;
 
     protected Order(){
@@ -72,5 +74,11 @@ public class Order {
         this.orderLineItems = orderLineItems;
 
         orderLineItems.forEach(orderLineItem -> orderLineItem.setOrder(this));
+    }
+
+    public void validateOrderStatusShouldComplete() {
+        if (!OrderStatus.COMPLETION.equals(orderStatus)) {
+            throw new IllegalArgumentException("계산이 완료된 주문이 아닙니다.");
+        }
     }
 }

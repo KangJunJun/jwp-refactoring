@@ -1,9 +1,8 @@
 package kitchenpos.ordertable.applictaion;
 
-import java.util.Arrays;
 import java.util.List;
-import kitchenpos.dao.OrderDao;
-import kitchenpos.order.domain.OrderStatus;
+import kitchenpos.order.domain.Order;
+import kitchenpos.order.domain.OrderRepository;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
 import kitchenpos.ordertable.dto.OrderTableRequest;
@@ -13,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderTableService {
-    private final OrderDao orderDao;
+    private final OrderRepository orderRepository;
     private final OrderTableRepository orderTableRepository;
 
-    public OrderTableService(final OrderDao orderDao, final OrderTableRepository orderTableRepository) {
-        this.orderDao = orderDao;
+    public OrderTableService(final OrderRepository orderRepository, final OrderTableRepository orderTableRepository) {
+        this.orderRepository = orderRepository;
         this.orderTableRepository = orderTableRepository;
     }
 
@@ -33,12 +32,8 @@ public class OrderTableService {
     @Transactional
     public OrderTableResponse changeEmpty(final Long orderTableId, final OrderTable orderTable) {
         final OrderTable savedOrderTable = getSavedOrderTable(orderTableId);
-        if (orderDao.existsByOrderTableIdAndOrderStatusIn(
-                orderTableId, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))) {
-            throw new IllegalArgumentException();
-        }
-
-        savedOrderTable.changeEmpty(orderTable.isEmpty());
+        List<Order> orders = orderRepository.findAllByOrderTableId(orderTableId);
+        savedOrderTable.changeEmpty(orderTable.isEmpty(), orders);
 
         return OrderTableResponse.of(orderTableRepository.save(savedOrderTable));
     }

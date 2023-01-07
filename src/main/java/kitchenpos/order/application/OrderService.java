@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import kitchenpos.dao.OrderLineItemDao;
+import kitchenpos.menu.domain.MenuRepository;
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderRepository;
 import kitchenpos.order.domain.OrderStatus;
-import kitchenpos.menu.domain.MenuRepository;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,7 @@ public class OrderService {
     @Transactional
     public Order create(final Order order) {
         final List<OrderLineItem> orderLineItems = order.getOrderLineItems();
+        //final List<OrderLineItemRequest> OrderLineItemRequests = order.getOrderLineItems();
 
         if (CollectionUtils.isEmpty(orderLineItems)) {
             throw new IllegalArgumentException();
@@ -51,17 +52,19 @@ public class OrderService {
             throw new IllegalArgumentException();
         }
 
+//        menuIds.stream()
+//                .map(this::findMenuById)
+//                .collect(Collectors.toList());
+
         final OrderTable orderTable = orderTableRepository.findById(order.getOrderTable().getId())
                 .orElseThrow(IllegalArgumentException::new);
-
-        Order order1 = new Order(orderTable, OrderStatus.COOKING);
 
         final Order savedOrder = orderRepository.save(order);
 
         final Long orderId = savedOrder.getId();
         final List<OrderLineItem> savedOrderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItem : orderLineItems) {
-            orderLineItem.setOrderId(orderId);
+            orderLineItem.updateOrder(savedOrder);
             savedOrderLineItems.add(orderLineItemDao.save(orderLineItem));
         }
         savedOrder.setOrderLineItems(savedOrderLineItems);
