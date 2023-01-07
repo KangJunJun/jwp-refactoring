@@ -1,5 +1,6 @@
 package kitchenpos.order.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import kitchenpos.menu.domain.Menu;
@@ -32,7 +33,7 @@ public class OrderRequest {
     }
 
     public Order createOrder(OrderTable orderTable, List<Menu> menus) {
-        Order order = new Order(orderTable, OrderStatus.COOKING);
+        Order order = new Order(orderTable, OrderStatus.COOKING, LocalDateTime.now());
         List<OrderLineItem> orderLineItems = getOrderLineItems().stream()
                 .map(item -> item.createOrderLineItem(menus))
                 .collect(Collectors.toList());
