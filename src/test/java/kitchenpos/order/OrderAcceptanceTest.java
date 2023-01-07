@@ -17,13 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import kitchenpos.AcceptanceTest;
+import kitchenpos.menu.domain.Menu;
+import kitchenpos.menu.domain.MenuGroup;
+import kitchenpos.menu.dto.MenuResponse;
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderStatus;
-import kitchenpos.menu.domain.MenuGroup;
-import kitchenpos.menu.dto.MenuResponse;
-import kitchenpos.product.dto.ProductResponse;
+import kitchenpos.order.dto.OrderLineItemRequest;
 import kitchenpos.ordertable.dto.OrderTableResponse;
+import kitchenpos.product.dto.ProductResponse;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -86,8 +88,10 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         // then
         주문_생성_실패됨(메뉴없이주문);
 
+        // given
+        MenuResponse nonMenuResponse = MenuResponse.from(new Menu(0L,"없는메뉴",BigDecimal.valueOf(0),0L));
         // when
-        ExtractableResponse<Response> 없는메뉴주문 = 주문_생성_요청(테이블, null);
+        ExtractableResponse<Response> 없는메뉴주문 = 주문_생성_요청(테이블, nonMenuResponse);
         // then
         주문_생성_실패됨(없는메뉴주문);
 
@@ -106,11 +110,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         // then
         주문_상태_변경됨(식사상태변경);
 
-        // given
-        Order 없는주문 = new Order();
-        없는주문.setId(Long.MAX_VALUE);
         // when
-        ExtractableResponse<Response> 없는상태변경 = 주문_상태_변경_요청(없는주문, OrderStatus.MEAL);
+        ExtractableResponse<Response> 없는상태변경 = 없는_주문_상태_변경_요청(OrderStatus.MEAL);
         // then
         주문_상태_변경_실패됨(없는상태변경);
     }
@@ -128,17 +129,14 @@ public class OrderAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private static List<OrderLineItem> toOrderLoneItems(MenuResponse[] menus) {
+    private static List<OrderLineItemRequest> toOrderLoneItems(MenuResponse[] menus) {
         if (ObjectUtils.isEmpty(menus)) {
             return Collections.emptyList();
         }
 
         return Arrays.stream(menus)
                 .map(m -> {
-                    OrderLineItem orderLineItem = new OrderLineItem();
-                    orderLineItem.setMenuId(m.getId());
-                    orderLineItem.setQuantity(1L);
-                    return orderLineItem;
+                    return OrderLineItemRequest.of(m.getId(), 1L);
                 })
                 .collect(Collectors.toList());
     }
@@ -159,6 +157,18 @@ public class OrderAcceptanceTest extends AcceptanceTest {
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/api/orders/{orderId}/order-status", order.getId())
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 없는_주문_상태_변경_요청(OrderStatus status) {
+        Map<String, Object> request = new HashMap<>();
+        request.put("orderStatus", status.name());
+        return RestAssured
+                .given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/api/orders/{orderId}/order-status", 0)
                 .then().log().all()
                 .extract();
     }

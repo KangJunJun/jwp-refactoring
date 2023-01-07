@@ -1,11 +1,19 @@
 package kitchenpos.order.domain;
 
-import kitchenpos.ordertable.domain.OrderTable;
-import org.springframework.data.annotation.CreatedDate;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import kitchenpos.ordertable.domain.OrderTable;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 public class Order {
@@ -22,6 +30,8 @@ public class Order {
 
     @CreatedDate
     private LocalDateTime orderedTime;
+
+    @OneToMany(fetch = FetchType.LAZY)
     private List<OrderLineItem> orderLineItems;
 
     protected Order(){
@@ -29,11 +39,13 @@ public class Order {
 
     public Order(
             OrderTable orderTable,
-            OrderStatus orderStatus
+            OrderStatus orderStatus,
+            LocalDateTime orderedTime
     ) {
         validate(orderTable);
         this.orderTable = orderTable;
         this.orderStatus = orderStatus;
+        this.orderedTime = orderedTime;
     }
 
     private void validate(OrderTable orderTable) {
@@ -72,5 +84,11 @@ public class Order {
         this.orderLineItems = orderLineItems;
 
         orderLineItems.forEach(orderLineItem -> orderLineItem.setOrder(this));
+    }
+
+    public void validateOrderStatusShouldComplete() {
+        if (!OrderStatus.COMPLETION.equals(orderStatus)) {
+            throw new IllegalArgumentException("계산이 완료된 주문이 아닙니다.");
+        }
     }
 }

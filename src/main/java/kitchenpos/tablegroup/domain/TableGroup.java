@@ -10,6 +10,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import kitchenpos.order.domain.Order;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTables;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -59,7 +60,8 @@ public class TableGroup {
         return orderTables.stream().anyMatch(it -> !it.isEmpty() || it.isGrouped());
     }
 
-    public void ungroup() {
+    public void ungroup(List<Order> orders) {
+        orders.forEach(Order::validateOrderStatusShouldComplete);
         orderTables.clear();
     }
 
@@ -73,5 +75,9 @@ public class TableGroup {
 
     public List<OrderTable> getOrderTables() {
         return orderTables.get();
+    }
+
+    public List<Long> getOrderTableIds() {
+        return orderTables.getIds();
     }
 }
