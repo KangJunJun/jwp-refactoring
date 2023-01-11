@@ -92,9 +92,9 @@ public class TableAcceptanceTest extends AcceptanceTest {
 
         // when
         //단체_지정_생성_요청(손님이_있는_테이블);
-        //ExtractableResponse<Response> 단체테이블변경 = 테이블_비움_여부_변경_요청(손님이_있는_테이블, true);
+        ExtractableResponse<Response> 단체테이블변경 = 테이블_비움_여부_변경_요청(손님이_있는_테이블, true);
         // then
-        //테이블_비움_여부_변경됨(단체테이블변경);
+        테이블_비움_여부_변경됨(단체테이블변경);
 
         // when
         OrderTableResponse 주문이_들어간_테이블 = 주문이_들어간_테이블_가져오기();

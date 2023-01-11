@@ -60,7 +60,7 @@ public class Order {
     }
 
     public void setOrderStatus(final OrderStatus orderStatus) {
-        validateOrderStatusShouldComplete();
+        validateUpdateOrderStatus();
         this.orderStatus = orderStatus;
     }
 
@@ -81,6 +81,12 @@ public class Order {
     public void validateOrderStatusShouldComplete() {
         if (!OrderStatus.COMPLETION.equals(orderStatus)) {
             throw new IllegalArgumentException("계산이 완료된 주문이 아닙니다.");
+        }
+    }
+
+    private void validateUpdateOrderStatus() {
+        if (OrderStatus.COMPLETION.equals(orderStatus)) {
+            throw new IllegalArgumentException("계산이 완료된 주문이 입니다.");
         }
     }
 }

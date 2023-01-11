@@ -20,10 +20,10 @@ import kitchenpos.AcceptanceTest;
 import kitchenpos.menu.domain.Menu;
 import kitchenpos.menu.domain.MenuGroup;
 import kitchenpos.menu.dto.MenuResponse;
-import kitchenpos.order.domain.Order;
-import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.order.dto.OrderLineItemRequest;
+import kitchenpos.order.dto.OrderLineItemResponse;
+import kitchenpos.order.dto.OrderResponse;
 import kitchenpos.ordertable.dto.OrderTableResponse;
 import kitchenpos.product.dto.ProductResponse;
 import org.apache.commons.lang3.ObjectUtils;
@@ -81,7 +81,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         // then
         주문_생성됨(주문생성);
         주문_생성시_조리상태_확인(주문생성);
-        Order 주문 = 주문생성.as(Order.class);
+        OrderResponse 주문 = 주문생성.as(OrderResponse.class);
 
         // when
         ExtractableResponse<Response> 메뉴없이주문 = 주문_생성_요청(테이블);
@@ -149,14 +149,14 @@ public class OrderAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 주문_상태_변경_요청(Order order, OrderStatus status) {
+    public static ExtractableResponse<Response> 주문_상태_변경_요청(OrderResponse orderResponse, OrderStatus status) {
         Map<String, Object> request = new HashMap<>();
         request.put("orderStatus", status.name());
         return RestAssured
                 .given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/api/orders/{orderId}/order-status", order.getId())
+                .when().put("/api/orders/{orderId}/order-status", orderResponse.getId())
                 .then().log().all()
                 .extract();
     }
@@ -178,7 +178,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     }
 
     public static void 주문_생성시_조리상태_확인(ExtractableResponse<Response> response) {
-        Order order = response.as(Order.class);
+        OrderResponse order = response.as(OrderResponse.class);
         assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
     }
 
@@ -195,11 +195,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     }
 
     public static void 주문_목록_주문에_주문_항목이_포함됨(ExtractableResponse<Response> response, MenuResponse... menuResponses) {
-        List<Long> menuIds = response.jsonPath().getList(".", Order.class)
+        List<Long> menuIds = response.jsonPath().getList(".", OrderResponse.class)
                 .stream()
                 .flatMap(o -> o.getOrderLineItems().stream())
-                .map(OrderLineItem::getMenuId)
+                .map(OrderLineItemResponse::getMenuId)
                 .collect(Collectors.toList());
+
 
         List<Long> expectedIds = Arrays.stream(menuResponses)
                 .map(MenuResponse::getId)
