@@ -60,6 +60,7 @@ public class Order {
     }
 
     public void setOrderStatus(final OrderStatus orderStatus) {
+        validateOrderStatusShouldComplete();
         this.orderStatus = orderStatus;
     }
 
