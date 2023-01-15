@@ -17,6 +17,10 @@ public class MenuRequest {
         this.menuProducts = menuProducts;
     }
 
+    public static MenuRequest of(String name, BigDecimal price, Long menuGroupId, List<MenuProductRequest> menuProducts){
+        return new MenuRequest(name, price,menuGroupId, menuProducts);
+    }
+
     public String getName() {
         return name;
     }
